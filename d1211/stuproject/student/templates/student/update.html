@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>학생수정페이지</h2>
+    <h2>{{stu}}</h2>
+    <form action="{% url 'student:update' stu.sno %}" method="post">
+        {% csrf_token %}
+        <label>이름</label>
+        <input type='text' name='name' value={{stu.name}}><br>
+        <label>나이</label>
+        <input type='text' name='age' value={{stu.age}}><br>
+        <label>학년</label>
+        <input type='text' name='grade' value={{stu.grade}}><br>
+        <label>성별</label><br>
+        <input type='radio' name='gender' id='남자' value="남자" 
+        {% if '남자' in stu.gender %}checked{% endif %}>
+        {% comment %} 남자가 선택되어있으면 남자 체크 {% endcomment %}
+        <label for='남자'>남자</label>
+        <input type='radio' name='gender' id='여자' value="여자"
+        {% if '여자' in stu.gender %}checked{% endif %}> 
+        {% comment %} 여자가 선택되어있으면 여자 체크 {% endcomment %}
+        <label for='여자'>여자</label>
+        <br>
+        <label>취미</label><br>
+        <input type='checkbox' name='hobby' id='게임' value="게임" 
+        {% if '게임' in stu.hobby %}checked{% endif %}>
+        <label for='게임'>게임</label>
+        <input type='checkbox' name='hobby' id='골프' value="골프"
+        {% if '골프' in stu.hobby %}checked{% endif %}>
+        <label for='골프'>골프</label>
+        <input type='checkbox' name='hobby' id='수영' value="수영"
+        {% if '수영' in stu.hobby %}checked{% endif %}>
+        <label for='수영'>수영</label>
+        <input type='checkbox' name='hobby' id='조깅' value="조깅"
+        {% if '조깅' in stu.hobby %}checked{% endif %}>
+        <label for='조깅'>조깅</label>
+        <input type='checkbox' name='hobby' id='독서' value="독서"
+        {% if '독서' in stu.hobby %}checked{% endif %}>
+        <label for='독서'>독서</label>
+
+        <br>
+
+
+
+        <input type='submit' value='학생수정'><br>
+    </form>
+
+
+
+
+    <ul>
+        <li><a href='javascript:window.history.back();'>이전페이지 이동</a></li>
+    </ul>
+
+</body>
+</html>
