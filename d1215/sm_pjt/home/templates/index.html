@@ -7,12 +7,19 @@
 </head>
 <body>
     <h2>메인페이지</h2>
+    {% if not request.session.session_id %}
     <ul>
-        <li><a href=''>로그인</a></li>
+        <li><a href='/member/login/'>로그인</a></li>
         <li><a href=''>회원가입</a></li>
-        <li><a href=''>로그아웃</a></li>
-        <li><a href=''>게시판</a></li>
+        <li><a href='/admin/'>admin관리자</a></li>
     </ul>
-    
+    {% else %}
+    <ul>
+        <li><a href='{% url "member:logout" %}'>로그아웃</a></li>
+        <li><a href='/board/list/'>게시판</a></li>
+        <li><a href='/admin/'>admin관리자</a></li>
+    </ul>
+    {% endif %}
+
 </body>
 </html>
