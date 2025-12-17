@@ -1,0 +1,54 @@
+{% load static %}
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}SafeMap{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+  <script src="{% static 'js/site.js' %}"></script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="{% url 'pages:home' %}"><b>Safe</b>Map</a>
+    <nav class="navlinks">
+      <a class="pill" href="{% url 'reports:map' %}">지도</a>
+      <a class="pill" href="{% url 'reports:new' %}">제보하기</a>
+      <a class="pill" href="{% url 'chatbot:chat' %}">챗봇</a>
+      <a class="pill" href="{% url 'pages:about' %}">서비스 소개</a>
+      {% if user.is_authenticated %}
+        <a class="pill" href="{% url 'accounts:profile' %}">내 프로필</a>
+        <a class="pill" href="{% url 'accounts:logout' %}">로그아웃</a>
+      {% else %}
+        <a class="pill" href="{% url 'accounts:login' %}">로그인</a>
+        <a class="pill primary" href="{% url 'accounts:signup' %}">회원가입</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="container">
+    {% if messages %}
+      {% for m in messages %}
+        <div class="notice" style="margin: 10px 0;">{{ m }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="container footer">
+    <div class="notice-wrap">
+        <div class="notice-title">공지</div>
+        <div class="notice-container">
+            <div class="notice-text">
+                📢 시스템 점검 안내 (12/20 02:00~04:00) &nbsp;&nbsp;
+                📢 신규 회원 이벤트 진행중! &nbsp;&nbsp;
+                📢 고객센터 운영시간: 09:00~18:00
+            </div>
+        </div>
+    </div>
+    <div class="small">© {{ now|date:"Y" }} SafeMap — 사건·사고 제보를 요약해 지도에 보여주는 실험적 안전 서비스</div>
+  </footer>
+</body>
+</html>

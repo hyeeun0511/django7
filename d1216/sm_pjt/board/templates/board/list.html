@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VLAST Shop - 게시판</title>
+  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" integrity="sha512-10/jx2EXwxxWqCLX/hHth/vu2KY3jCF70dCQB8TSgNjbCVAC/8vai53GfMDrO2Emgwccf2pJqxct9ehpzG+MTw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link href="css/style.css" rel="stylesheet" type="text/css" >
   <style>
@@ -278,7 +280,15 @@
           {% for b in list  %}
             <tr>
               <td>{{b.bno}}</td>
-              <td class="title"><a href="/board/view/{{b.bno}}/">{{b.btitle}}</a></td>
+              <td class="title">
+                <a href="/board/view/{{b.bno}}/">
+                  {% for i in ''|rjust:b.bindent %}
+                  <img src='/static/images/icon_reply.292031fe.png' style='width:10px;margin-left:2px;'/>
+                  {% endfor %}  
+                  {% comment %} rjust : 공백제거  문자열로 바꿔서 문자열 횟수만큼 반복 {% endcomment %}
+                  {{b.btitle}}
+                </a>
+              </td>
               <td>{{b.member.name}}</td>
               <td class="date">{{b.bdate|date:'Y-m-d H:i'}}</td>
               <td class="views">{{b.bhit}}</td>
