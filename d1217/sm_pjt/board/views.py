@@ -3,6 +3,11 @@ from board.models import Board
 from comment.models import Comment
 from member.models import Member
 from django.db.models import F,Q
+from django.core.paginator import Paginator
+
+# 차트 그리기
+def chart(request):
+    return render(request,'board/chart.html')
 
 # 게시판 답글달기
 def reply(request,bno):
@@ -63,7 +68,7 @@ def delete(request,bno):
     context = {'flag':2}
     return redirect("/board/list/")
 
-# 게시판 상세보기 - 해당 하단댓글도 함께 가져올수 있음
+# 게시판 상세보기 - 해당 하단댓글도 함께 가져올 수 있음.
 def view(request,bno):
     # 게시글 가져오기
     qs = Board.objects.filter(bno=bno)
@@ -75,7 +80,17 @@ def view(request,bno):
     context = {'board':qs[0],'clist':c_qs}
     return render(request,'board/view.html',context)
 
-from django.core.paginator import Paginator
+# 게시판 상세보기 - 해당 하단댓글도 함께 가져올 수 있음.
+def view2(request,bno):
+    print('bno :',bno)
+    # 게시글 가져오기
+    qs = Board.objects.filter(bno=bno)
+    # 하단댓글
+    c_qs = Comment.objects.filter(board=qs[0]).order_by('-cno')
+    context = {'board':qs[0],'clist':c_qs}
+    return render(request,'board/view2.html',context)
+
+
 
 # 게시판 리스트
 def list(request):

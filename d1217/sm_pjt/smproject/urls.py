@@ -9,6 +9,7 @@ urlpatterns = [
     path('member/', include('member.urls')),
     path('board/', include('board.urls')),
     path('comment/', include('comment.urls')),
+    path('stuscore/', include('stuscore.urls')),
 ]
 
 
