@@ -4,6 +4,9 @@ from comment.models import Comment
 from member.models import Member
 from django.db.models import F,Q
 from django.core.paginator import Paginator
+import requests
+import json
+import pprint
 
 # 차트 그리기
 def chart(request):
@@ -89,6 +92,44 @@ def view2(request,bno):
     c_qs = Comment.objects.filter(board=qs[0]).order_by('-cno')
     context = {'board':qs[0],'clist':c_qs}
     return render(request,'board/view2.html',context)
+
+
+
+# 영화진흥위원회 - api
+def list3(request):
+    
+    # 영화진흥위원회 api 접속
+    public_key = '5a3dff2adfbd506a1d6c23d668a6b759'  # 영화진흥위원회 포털에서 발급받은 일반 인증키
+    # page_no = request.GET.get('page_no')
+    page_no = 1
+    url = f'http://kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json?key={public_key}&targetDt=20120101'
+    # 영화진흥위원회 정보 가져오기
+    rel = requests.get(url)
+    # 파일 변환 : 문자열 -> json타입변경
+    json_data = json.loads(rel.text)
+    p_list = json_data['boxOfficeResult']['weeklyBoxOfficeList']
+    print('json데이터 ---------------- : ',p_list[0])
+    context = {'result':'성공','list':p_list}
+    return render(request,'board/list3.html',context)
+
+
+
+# 공공데이터 리스트 - api
+def list2(request):
+    
+    # 공공데이터 api 접속
+    public_key = 'f072e141abd7369b66b965594588f51465fa1cfef007631f76014050c5c6157c'  # 공공데이터 포털에서 발급받은 일반 인증키
+    # page_no = request.GET.get('page_no')
+    page_no = 1
+    url = f'https://apis.data.go.kr/B551011/PhotoGalleryService1/galleryList1?serviceKey={public_key}&numOfRows=10&pageNo={page_no}&MobileOS=ETC&MobileApp=AppTest&arrange=A&_type=json'
+    # 공공데이터 정보 가져오기
+    rel = requests.get(url)
+    # 파일 변환 : 문자열 -> json타입변경
+    json_data = json.loads(rel.text)
+    p_list = json_data['response']['body']['items']['item']  # 공공데이터 리스트 넘어옴
+    print('json데이터 ---------------- : ',p_list[0])
+    context = {'result':'성공','list':p_list}
+    return render(request,'board/list2.html',context)
 
 
 

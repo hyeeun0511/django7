@@ -2,23 +2,28 @@ from django.shortcuts import render
 from comment.models import Comment
 from board.models import Board
 from member.models import Member
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse # 전송할때 Json타입으로 변경해서 전송
+from django.core import serializers  # Json타입으로 전달된 데이터를 파이썬데이터(set)로 변경
 
-
-
-# 4. 하단댓글 수정  cupdate
-
-
-# 3. 하단댓글 삭제   cdelete
+# 하단댓글 수정
+def cupdate(request):
+    if request.method == 'POST':
+        cno = request.POST.get('cno')
+        ccontent = request.POST.get('ccontent')
+        Comment.objects.filter(cno=cno).update(ccontent=ccontent)
+        
+        context = {'result': '성공','comment': ccontent}
+        return JsonResponse(context)
+    
+# 하단댓글 삭제
 def cdelete(request):
     if request.method == 'POST':
         cno = request.POST.get('cno')
         Comment.objects.get(cno=cno).delete()
-        context = {'result':'성공'}
-        return JsonResponse(context) # context를 json타입으로 변경해서 전송
+        context = {'result': '성공'}
+        return JsonResponse(context)
 
-
-# 2. 하단댓글 추가
+# 하단댓글 추가
 def cwrite(request):
     if request.method == 'POST':
         id = request.session.get('session_id')
@@ -27,20 +32,22 @@ def cwrite(request):
         board = Board.objects.get(bno=bno)
         cpw = request.POST.get('cpw')
         ccontent = request.POST.get('ccontent')
-        print(f"bno: {bno}, cpw:{cpw}, ccontent:{ccontent}")
-    
+        print(f"bno: {bno}, cpw: {cpw}, ccontent: {ccontent}")
+
         qs = Comment.objects.create(board=board,cpw=cpw,ccontent=ccontent,member=member)
+        # values()를 해야 list타입으로 변경가능
         c_qs = list(Comment.objects.filter(cno=qs.cno).values())
-        context = {'result': 'success', 'comment':c_qs[0]}
+        context = {'result': '성공', 'comment': c_qs[0]}
         return JsonResponse(context)
 
 
-# 1. 하단댓글 리스트
+
+# 하단댓글 리스트
 def clist(request):
     bno = request.GET.get('bno')
     print("bno 확인 : ",bno)
     board = Board.objects.get(bno=bno)
     qs = Comment.objects.filter(board=board).order_by('-cno')
-    list_qs = list(qs.values())
-    context = {'result': 'success', 'list':list_qs}
+    list_qs = list(qs.values())  # QuerySet → 리스트
+    context = {'result': 'success', 'list': list_qs}
     return JsonResponse(context)

@@ -29,8 +29,8 @@ INSTALLED_APPS = [
     'home',
     'member',
     'board',
-    'stuscore',
     'comment',
+    'stuscore',
 ]
 
 MIDDLEWARE = [
@@ -45,10 +45,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'smproject.urls'
 
+# 탬플릿 경로
+TEMPLATE_DIR = os.path.join(BASE_DIR,'templates')
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
