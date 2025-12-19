@@ -26,10 +26,10 @@
       {% endif %}
     </div>
     <div class="detail-buttons">
-      <a href="/board/list/">목록으로</a>
-      <a href="/board/reply/{{board.bno}}/">답글달기</a>
+      <a href="/board/list/?page={{page}}&search={{search}}">목록으로</a>
+      <a href="/board/reply/{{board.bno}}/page={{page}}&search={{search}}">답글달기</a>
       {% if board.member.id == request.session.session_id  %}
-        <a href="/board/update/{{board.bno}}/">수정</a>
+        <a href="/board/update/{{board.bno}}/page={{page}}&search={{search}}">수정</a>
         <button id="deleteBtn">삭제</button>
       {% endif %}
     </div>

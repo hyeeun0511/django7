@@ -1,13 +1,18 @@
 {% extends 'base.html' %}
 
 {% block title-block %}
-<title>VLAST Shop - 게시판 목록</title>
+<title>VLAST Shop - 게시판 리스트</title>
 {% endblock title-block %}
 
+
+
+<!-- block밖은 공통영역-->
 {% block css-block %}
-<!-- 개별영역 :css -->
-<link rel="stylesheet" href="/static/css/list.css">
+<!-- 개별영역 : css -->
+<link rel='stylesheet' href='/static/css/list.css'>
 {% endblock css-block %}
+
+
 
 {% block body-block %}
   <!-- 개별영역 : Board List -->
@@ -36,8 +41,7 @@
             <tr>
               <td>{{b.bno}}</td>
               <td class="title">
-                  <a href="/board/view/{{b.bno}}/?page={{page}}&search={{search}}">
-
+                <a href="/board/view/{{b.bno}}/">
                   {% for i in ''|rjust:b.bindent %}
                   <img src='/static/images/icon_reply.292031fe.png' style='width:10px;margin-left:2px;' >
                   {% endfor %}
@@ -101,18 +105,10 @@
               <a>&raquo;</a>
             {% endif %}
         </div>
-        <script>
-          function searchBtn(){
-              alert('검색어를 입력하세요');
-              frm.submit();
-            }
-        </script>
         <div class="search-box">
-          <form action="/board/list/" name='frm' method="get">
-            <input type="text" name='search' placeholder="검색어 입력" value='{{search}}'>
-            <button type='button' onclick='searchBtn()'>검색</button>
+            <input type="text" placeholder="검색어 입력">
+            <button>검색</button>
         </div>
-
     </div>
 
   </div>
