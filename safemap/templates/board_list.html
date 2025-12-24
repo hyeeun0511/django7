@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/board.css' %}">
+
+<div class="board-wrapper">
+    
+    <!-- ✅ 화면 오른쪽 고정 영역 -->
+    <div class="board-count-fixed">
+        총 게시물 : {{ total_count }}개
+    </div>
+    <!-- ✅ 화면 오른쪽 고정 영역 end -->
+
+    <div class="board-header">
+        <div class="board-header-top">
+            <div>
+                <h1>게시판</h1>
+                <p>우리 동네 사건·사고 공유 공간</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="board-card">
+        <table class="board-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>제목</th>
+                    <th>작성일</th>
+                    <th>작성자</th>
+                    <th>조회수</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for board in page_obj %}
+                <tr class="board-row" 
+                    data-href="{% url 'pages:board_detail' board.id %}?from={{ page_obj.number }}">
+                    <td>{{ board.id }}</td>
+
+                    <a class="title-link"
+                        href="{% url 'pages:board_detail' board.id %}?from={{ page_obj.number }}">
+                            {{ board.title }}
+                    </a>
+
+                    <td>{{ board.created_at|date:"Y-m-d" }}</td>
+                    <td>{{ board.author.username|default:"익명" }}</td>            <!-- 작성자 -->
+                    <td>{{ board.views|default:"0" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty">게시글이 없습니다.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- ✅ 페이지 번호 -->
+        <!-- ✅ 페이지 번호 (5개 묶음)**************************************************************************** -->
+        <div class="pagination">
+
+            <!-- 처음 / 이전 묶음 / 이전 -->
+            {% if page_obj.has_previous %}
+                <a class="page-btn" href="?page=1" aria-label="first">&laquo;</a>
+
+                {% if start_page > 1 %}
+                <a class="page-btn" href="?page={{ start_page|add:-1 }}" aria-label="prev-group">&lsaquo;</a>
+                {% else %}
+                <span class="page-btn disabled">&lsaquo;</span>
+                {% endif %}
+
+                <a class="page-btn" href="?page={{ page_obj.previous_page_number }}" aria-label="prev">&lt;</a>
+            {% else %}
+                <span class="page-btn disabled">&laquo;</span>
+                <span class="page-btn disabled">&lsaquo;</span>
+                <span class="page-btn disabled">&lt;</span>
+            {% endif %}
+
+            <!-- 페이지 번호 (항상 최대 5개) -->
+            {% for num in page_range %}
+                {% if num == page_obj.number %}
+                <span class="page-num active">{{ num }}</span>
+                {% else %}
+                <a class="page-num" href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            <!-- 다음 / 다음 묶음 / 끝 -->
+            {% if page_obj.has_next %}
+                <a class="page-btn" href="?page={{ page_obj.next_page_number }}" aria-label="next">&gt;</a>
+
+                {% if end_page < page_obj.paginator.num_pages %}
+                <a class="page-btn" href="?page={{ end_page|add:1 }}" aria-label="next-group">&rsaquo;</a>
+                {% else %}
+                <span class="page-btn disabled">&rsaquo;</span>
+                {% endif %}
+
+                <a class="page-btn" href="?page={{ page_obj.paginator.num_pages }}" aria-label="last">&raquo;</a>
+            {% else %}
+                <span class="page-btn disabled">&gt;</span>
+                <span class="page-btn disabled">&rsaquo;</span>
+                <span class="page-btn disabled">&raquo;</span>
+            {% endif %}
+
+        </div>
+
+        <!-- ✅ 게시글 페이지 번호 (5개 묶음) end**************************************************************************** -->
+    </div>
+
+    <!-- 글 작성 버튼 -->
+    <a href="{% url 'pages:board_create' %}" class="write-btn">글 작성</a>
+</div>
+
+<!-- ✅ 게시글 클릭 시 상세 페이지 이동 (링크 클릭은 예외 처리) -->
+<script>
+document.querySelectorAll('.board-row').forEach(row => {
+  row.addEventListener('click', (e) => {
+    // 제목 링크(a)를 눌렀을 땐 tr 클릭 이동 중복 방지
+    if (e.target.closest('a')) return;
+    window.location.href = row.dataset.href;
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/board.css' %}">
+
+<div class="board-wrapper">
+
+    <!-- 제목 영역 -->
+    <div class="board-header">
+        <h1>게시판</h1>
+        <p>우리 동네 사건·사고 공유 공간</p>
+    </div>
+
+    <!-- 게시글 카드 -->
+    <div class="board-card board-detail-card">
+
+        <h2 class="detail-title">{{ board.title }}</h2>
+
+        <div class="detail-meta">
+            <span>
+                작성자
+                {% if board.author %}
+                    {{ board.author.username }}
+                {% else %}
+                    익명
+                {% endif %}
+            </span>
+            <span>{{ board.created_at|date:"Y-m-d H:i" }}</span>
+            <span>조회수 {{ board.views }}</span>
+        </div>
+
+        <div class="detail-content">
+            {{ board.content|linebreaks }}
+        </div>
+
+        <div class="detail-actions">
+            <a href="{% url 'pages:board_list' %}?page={{ from_page }}" class="back-btn">← 목록으로</a>
+            <a href="{% url 'pages:board_list' %}" class="back-btn">수정</a>
+            <button type="button" class="back-btn danger" onclick="openDeleteModal()">삭제</button>
+        </div>
+    </div>
+
+    <!-- ✅ 상세 하단 게시글 목록 추가 (여기!) -->
+    <div class="board-card" style="margin-top:24px;">
+        <h3 class="detail-subtitle">게시글 목록</h3>
+
+        <table class="board-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>제목</th>
+                    <th>작성일</th>
+                    <th>작성자</th>
+                    <th>조회수</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in board_list %}
+                <tr class="board-row" data-href="{% url 'pages:board_detail' item.id %}?from={{ from_page }}">
+                    <td>{{ item.id }}</td>
+
+                    <td class="title">
+                        <a class="title-link" href="{% url 'pages:board_detail' item.id %}?from={{ from_page }}">
+                            {{ item.title }}
+                        </a>
+                    </td>
+
+                    <td>{{ item.created_at|date:"Y-m-d" }}</td>
+                    <td>{{ item.author.username|default:"익명" }}</td>
+                    <td>{{ item.views|default:"0" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty">게시글이 없습니다.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 삭제 확인 모달 -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>삭제하시겠습니까?</h3>
+            <p>이 게시글은 삭제 후 복구할 수 없습니다.</p>
+
+            <div class="modal-actions">
+                <button type="button" class="modal-btn cancel" onclick="closeDeleteModal()">취소</button>
+
+                <form method="post" action="{% url 'pages:board_delete' board.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="modal-btn confirm">삭제</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function openDeleteModal(){
+  const modal = document.getElementById('deleteModal');
+  if (!modal) return;
+  modal.classList.add('active');
+}
+
+function closeDeleteModal(){
+  const modal = document.getElementById('deleteModal');
+  if (!modal) return;
+  modal.classList.remove('active');
+}
+
+/* ✅ 하단 목록 행 클릭 이동(링크 클릭은 제외) */
+document.querySelectorAll('.board-row').forEach(row => {
+  row.addEventListener('click', (e) => {
+    if (e.target.closest('a')) return;
+    window.location.href = row.dataset.href;
+  });
+});
+</script>
+
+{% endblock %}
