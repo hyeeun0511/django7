@@ -1,4 +1,6 @@
 from django.contrib import admin
-from home.models import chartData
+from home.models import ChartData
 
-admin.site.register(chartData)
+
+admin.site.register(ChartData)
+

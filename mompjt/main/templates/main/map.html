@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="container main-content">
+    
+    <div class="map-wrapper">
+        <div class="map-controls">
+            <h3>📍 우리동네 찾기</h3>
+            <div class="select-group">
+                <select id="sido" disabled>
+                    <option>서울특별시</option>
+                </select>
+
+                <select id="gugun" onchange="changeGugun()">
+                    <option value="">모든 구</option>
+                    <option value="gangnam">강남구</option>
+                    <option value="seocho">서초구</option>
+                    <option value="songpa">송파구</option>
+                    <option value="mapo">마포구</option>
+                </select>
+
+                <select id="dong" onchange="moveMapToDong()">
+                    <option value="">모든 동</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="category-btn-group">
+            <button onclick="findPlaces('hospital')">🏥 병원</button>
+            <button onclick="findPlaces('pharmacy')">💊 약국</button>
+            <button onclick="findPlaces('cafe')">☕ 카페/맛집</button>
+            <button onclick="findPlaces('store')">🏪 편의점</button>
+        </div>
+
+        <div id="map"></div>
+    </div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    /* ---------------------------------------------------------
+       1. 지도 생성 및 설정
+       --------------------------------------------------------- */
+    // 기본 줌 컨트롤(왼쪽 상단) 끄고 생성
+    var map = L.map('map', {
+        zoomControl: false 
+    }).setView([37.5665, 126.9780], 11); // 초기위치: 서울 시청
+
+    // 줌 컨트롤을 '오른쪽 상단'에 새로 추가
+    L.control.zoom({
+        position: 'topright'
+    }).addTo(map);
+
+    // 구글 지도 (한글판) 배경 설정
+    L.tileLayer('http://mt0.google.com/vt/lyrs=m&hl=ko&x={x}&y={y}&z={z}', {
+        attribution: '&copy; Google Maps',
+        maxZoom: 20
+    }).addTo(map);
+
+
+    /* ---------------------------------------------------------
+       2. 지역 데이터 (구/동 정보)
+       --------------------------------------------------------- */
+    const areaData = {
+        "gangnam": {
+            center: [37.5172, 127.0473],
+            dongs: {
+                "sinsa": { name: "신사동", coords: [37.5240, 127.0227] },
+                "apgujeong": { name: "압구정동", coords: [37.5273, 127.0284] },
+                "nonhyeon": { name: "논현동", coords: [37.5113, 127.0283] },
+                "yeoksam": { name: "역삼동", coords: [37.5007, 127.0365] }
+            }
+        },
+        "seocho": {
+            center: [37.4837, 127.0324],
+            dongs: {
+                "seocho": { name: "서초동", coords: [37.4878, 127.0175] },
+                "banpo": { name: "반포동", coords: [37.5024, 126.9961] },
+                "bangbae": { name: "방배동", coords: [37.4827, 126.9926] }
+            }
+        },
+        "mapo": {
+            center: [37.5663, 126.9016],
+            dongs: {
+                "hongdae": { name: "서교동", coords: [37.5547, 126.9224] },
+                "sangam": { name: "상암동", coords: [37.5791, 126.8893] },
+                "mangwon": { name: "망원동", coords: [37.5562, 126.9013] }
+            }
+        },
+        "songpa": {
+             center: [37.5145, 127.1066],
+             dongs: {
+                 "jamsil": { name: "잠실동", coords: [37.5133, 127.0827] },
+                 "munjeong": { name: "문정동", coords: [37.4849, 127.1235] }
+             }
+        }
+    };
+
+
+    /* ---------------------------------------------------------
+       3. 기능 함수들
+       --------------------------------------------------------- */
+
+    // [구 변경] 시 지도 이동 & 동 목록 갱신
+    function changeGugun() {
+        var guSelect = document.getElementById("gugun");
+        var dongSelect = document.getElementById("dong");
+        var selectedGu = guSelect.value;
+
+        dongSelect.innerHTML = '<option value="">모든 동</option>';
+
+        if (selectedGu && areaData[selectedGu]) {
+            map.flyTo(areaData[selectedGu].center, 13, { duration: 1.5 });
+            var dongs = areaData[selectedGu].dongs;
+            for (var key in dongs) {
+                var option = document.createElement("option");
+                option.value = key;
+                option.text = dongs[key].name;
+                option.setAttribute('data-lat', dongs[key].coords[0]);
+                option.setAttribute('data-lng', dongs[key].coords[1]);
+                dongSelect.appendChild(option);
+            }
+        } else {
+            map.flyTo([37.5665, 126.9780], 11);
+        }
+    }
+
+    // [동 변경] 시 지도 이동 & 마커 표시
+    function moveMapToDong() {
+        var dongSelect = document.getElementById("dong");
+        var selectedOption = dongSelect.options[dongSelect.selectedIndex];
+
+        if (selectedOption.value !== "") {
+            var lat = selectedOption.getAttribute('data-lat');
+            var lng = selectedOption.getAttribute('data-lng');
+            map.flyTo([lat, lng], 15, { duration: 1.5 });
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup("<b>" + selectedOption.text + "</b><br>맘스로그 우리동네!")
+                .openPopup();
+        }
+    }
+
+    // [장소 찾기] (체험판 기능: 랜덤 마커)
+    var markers = [];
+
+// [장소 찾기] 기능 수정: 클릭 시 지도 확대(Zoom In) 추가
+    function findPlaces(category) {
+        // 1. 기존에 찍혀있던 마커들 싹 지우기
+        for(var i=0; i < markers.length; i++){
+            map.removeLayer(markers[i]);
+        }
+        markers = []; // 바구니 비우기
+
+        // 2. 현재 지도의 중심 좌표 가져오기
+        var center = map.getCenter();
+        
+        // ★ [핵심 추가] 지도를 16레벨로 부드럽게 확대! (숫자가 클수록 더 많이 확대됨)
+        map.flyTo(center, 16, { duration: 1.5 });
+
+        // 3. 카테고리별 이름표 설정
+        var label = "";
+        if(category === 'hospital') { label = "소아과"; }
+        else if(category === 'pharmacy') { label = "약국"; }
+        else if(category === 'cafe') { label = "카페"; }
+        else { label = "편의점"; }
+
+        // 4. 지도 중심 주변에 랜덤 마커 찍기 (체험판)
+        // 줌인이 되니까 마커들을 중심에 좀 더 모아서 찍어줍니다 (* 0.005)
+        for (var i = 0; i < 5; i++) {
+            var lat = center.lat + (Math.random() - 0.5) * 0.005; 
+            var lng = center.lng + (Math.random() - 0.5) * 0.005;
+            
+            var marker = L.marker([lat, lng]).addTo(map)
+                .bindPopup("<b> " + label + " " + (i+1) + "호점</b><br>거리: 아주 가까움")
+                .openPopup(); // 마커 찍자마자 말풍선 열기
+            
+            markers.push(marker);
+        }
+    }
+</script>
+{% endblock %}

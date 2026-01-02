@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/banner.css' %}">
+
+<div class="content-wrapper">
+    <div class="main-left">
+        
+        <section class="main-banner">
+            <div class="banner-slider">
+                <div class="banner-track">
+                    
+                    <div class="banner-item" style="background-color: #fdf3e6;"> 
+                        <div class="banner-text">
+                            <h2>12월 맘스로그 베이비페어!</h2>
+                            <p>사전등록하고 푸짐한 경품 받아가세요~</p>
+                        </div>
+                        <img src="{% static 'images/image_3.png' %}" alt="베이비페어" class="banner-image">
+                    </div>
+
+                    <div class="banner-item" style="background-color: #e6f7ff;">
+                        <div class="banner-text">
+                            <h2>우리 아이 첫 이유식 가이드</h2>
+                            <p>초기부터 완료기까지 단계별 레시피!</p>
+                        </div>
+                        <img src="{% static 'images/miage_2.png' %}" alt="이유식" class="banner-image">
+                    </div>
+
+                    <div class="banner-item" style="background-color: #fff0f6;">
+                        <div class="banner-text">
+                            <h2>겨울철 실내놀이 BEST 5</h2>
+                            <p>집에서도 지루하지 않게 노는 방법</p>
+                        </div>
+                        <img src="{% static 'images/image_4.png' %}" alt="실내놀이" class="banner-image">
+                    </div>
+
+                    <div class="banner-item" style="background-color: #f6ffed;">
+                        <div class="banner-text">
+                            <h2>육아용품 중고장터 OPEN</h2>
+                            <p>안 쓰는 장난감, 깨끗하게 나누세요</p>
+                        </div>
+                        <img src="{% static 'images/image_5.png' %}" alt="중고장터" class="banner-image">
+                    </div>
+
+                    <div class="banner-item" style="background-color: #fff7e6;">
+                        <div class="banner-text">
+                            <h2>맘스로그 신규가입 이벤트</h2>
+                            <p>지금 가입하면 포인트 2배 적립!</p>
+                        </div>
+                        <img src="{% static 'images/image_1.png' %}" alt="이벤트" class="banner-image">
+                    </div>
+
+                </div>
+                <button class="slider-btn prev-btn" onclick="moveSlide(-1)">❮</button>
+                <button class="slider-btn next-btn" onclick="moveSlide(1)">❯</button>
+            </div>
+        </section>
+        <section class="hot-posts">
+            <div class="section-header">
+                <h3>실시간 인기글</h3>
+                <a href="#" class="more-link">더보기 ></a>
+            </div>
+            <div class="post-grid">
+                <div class="post-card">
+                    <span class="category">[육아꿀팁]</span>
+                    <a href="#" class="title">돌 아기 재우는 저만의 노하우 공유해요! (성공률 99%)</a>
+                    <div class="post-info">
+                        <span class="author">사랑맘</span> | <span>조회 1.2k</span>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <span class="category">[요리]</span>
+                    <a href="#" class="title">편식하는 아이도 잘 먹는 '채소 듬뿍 카레' 레시피 </a>
+                    <div class="post-info">
+                        <span class="author">요리왕엄마</span> | <span>조회 850</span>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <span class="category">[질문]</span>
+                    <a href="#" class="title">혹시 이 근처에 주말 진료하는 소아과 있나요? ㅠㅠ 급해요</a>
+                    <div class="post-info">
+                        <span class="author">초보맘</span> | <span>조회 620</span>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <span class="category">[일상]</span>
+                    <a href="#" class="title">오늘 날씨 너무 좋네요! 유모차 산책 다녀왔어요 </a>
+                    <div class="post-info">
+                        <span class="author">누워있고싶다</span> | <span>조회 400</span>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <span class="category">[질문]</span>
+                    <a href="#" class="title">2박3일 여행지 좋은곳 추천해주세요^^ </a>
+                    <div class="post-info">
+                        <span class="author">행복한하루</span> | <span>조회 100</span>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <span class="category">[일상]</span>
+                    <a href="#" class="title">오늘 날씨 너무 좋네요! 유모차 산책 다녀왔어요 </a>
+                    <div class="post-info">
+                        <span class="author">행복한하루</span> | <span>조회 500</span>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <span class="category">[일상]</span>
+                    <a href="#" class="title">오늘 날씨 너무 좋네요! 유모차 산책 다녀왔어요 </a>
+                    <div class="post-info">
+                        <span class="author">행복한하루</span> | <span>조회 500</span>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <span class="category">[일상]</span>
+                    <a href="#" class="title">오늘 날씨 너무 좋네요! 유모차 산책 다녀왔어요 </a>
+                    <div class="post-info">
+                        <span class="author">행복한하루</span> | <span>조회 500</span>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <span class="category">[일상]</span>
+                    <a href="#" class="title">오늘 날씨 너무 좋네요! 유모차 산책 다녀왔어요 </a>
+                    <div class="post-info">
+                        <span class="author">행복한하루</span> | <span>조회 500</span>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <span class="category">[일상]</span>
+                    <a href="#" class="title">오늘 날씨 너무 좋네요! 유모차 산책 다녀왔어요 </a>
+                    <div class="post-info">
+                        <span class="author">행복한하루</span> | <span>조회 500</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <aside class="main-right">
+        <div class="login-box">
+            {% if user.is_authenticated %}
+                <div class="user-info-area">
+                    <p class="login-text">
+                        <span class="grade-badge">{{ user.get_grade_display }}</span><br>
+                        <strong>{{ user.nickname }}</strong>님,<br>
+                        오늘도 행복한 하루 되세요! 
+                    </p>
+                    <a href="{% url 'accounts:profile' %}" class="btn-login" style="margin-bottom:5px; background:white; color:#333; border:1px solid #ddd;">마이페이지</a>
+                </div>
+                
+                <a href="{% url 'accounts:logout' %}" class="btn-login btn-logout">맘스로그 로그아웃</a>
+                
+            {% else %}
+                <p class="login-text">더 많은 이야기를 나눠보세요!</p>
+                <a href="{% url 'accounts:login' %}" class="btn-login">맘스로그 로그인</a>
+                <div class="login-links">
+                    <a href="{% url 'accounts:find_id' %}">아이디 찾기</a> | 
+                    <a href="{% url 'accounts:find_pw' %}">비밀번호 찾기</a> | 
+                    <a href="{% url 'accounts:signup' %}"><b>회원가입</b></a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="side-banner">
+            <img src="{% static 'images/ad_banner.png' %}" alt="광고 배너" class="ad-image">
+        </div>
+    </aside>
+</div>
+
+<script>
+    let currentIndex = 0;
+    const track = document.querySelector('.banner-track');
+    const slides = document.querySelectorAll('.banner-item');
+    const totalSlides = slides.length;
+    let slideInterval;
+
+    function updateSlidePosition() {
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+
+    function moveSlide(direction) {
+        currentIndex += direction;
+        if (currentIndex >= totalSlides) currentIndex = 0; 
+        else if (currentIndex < 0) currentIndex = totalSlides - 1; 
+        updateSlidePosition();
+        resetAutoSlide();
+    }
+
+    function startAutoSlide() {
+        slideInterval = setInterval(() => { moveSlide(1); }, 3000);
+    }
+
+    function resetAutoSlide() {
+        clearInterval(slideInterval);
+        startAutoSlide();
+    }
+
+    startAutoSlide();
+</script>
+
+{% endblock %}

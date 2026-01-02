@@ -4,49 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
     <title>차트그리기</title>
     <style>
-        #chart_back{width: 800px; height: 600px; border:1px solid #000;}
+        #chart_back{width:800px; height:600px; border:1px solid black;}
     </style>
 </head>
 <body>
     <div>
         <h2>차트그리기</h2>
-        <input type="text" name='m_data' id="m_data">
-        <button type="button" onclick="chartBtn()">가져오기</button>
+        <input type='text' name='m_data' id='m_data'>
+        <button type='button' onclick='chartBtn()'>가져오기</button>
     </div>
-
     <div id='chart_back'>
         <canvas id="myChart"></canvas>
     </div>
 
     <script>
         function chartBtn(){
-            alert("데이터를 가져와 차트를 그립니다.")
+            alert("데이터를 가져와 차트를 그립니다.");
             // 요청번호
-            let input_data = $('#m_data').val();
-            //chart그리기에 필요한 데이터
-            d_data = [];
-            label_data = [];
-
-            //ajax로 데이터 가져오기
+            let input_data = $("#m_data").val();
+            // chart그리기에 필요한 데이터
+            let d_data = [];
+            let label_data = [];
+            
+            //ajax으로 통신
             $.ajax({
-                url : '/chart_json2/', //요청경로
-                type : 'GET', //요청방식
-                dataType : 'json', //응답받을 데이터 형식
-                headers: {'X-CSRFTOKEN' : '{{ csrf_token }}' }, //csrf토큰 추가
-                data : {'input_data' : input_data}, //요청시 전달값
-                success : function(data){
-                    //통신성공시 실행할 코드
+                url:'/chart_json2/',
+                type:'get',
+                dataType:'json',
+                headers:{'X-CSRFToken':'{{csrf_token}}'},
+                data:{'input_data':input_data},
+                success:function(data){
                     alert('성공');
-                    d_data = data.dd2_data;
-                    label_data = data.ll2_data;
-                    console.log(data);
+                    console.log('views 넘어온 데이터 : '+data.list_data);
+                    // 데이터 초기화
+                    d_data = [];
+                    label_data = [];
+                    // 데이터 추가
+                    for (var i=0;i<data.list_data.length;i++){
+                        d_data.push(data.list_data[i].cdata);
+                        label_data.push(data.list_data[i].cyear);
+                    }
 
-                    // 비동기 방식으로 진행되어 ajax 데이터가 늦게 전달됨.
-                    // 차트 그리기 명령어도 ajax안에 입력이 되어야함.
-                    // chart 그리기
+                    // 비동기 방식으로 진행이 되어 ajax 데이터가 늦게 전달이 됨.
+                    // 차트 그리기 명령어도 ajax안에 입력이 되어야 함.
+                    // 차트 그리기
                     const ctx = document.getElementById('myChart');
 
                     new Chart(ctx, {
@@ -60,24 +64,26 @@
                         }]
                         },
                         options: {
-                        scales: {
-                            y: {
-                            beginAtZero: true
+                            scales: {
+                                y: {
+                                beginAtZero: true
+                                }
                             }
-                        }
-                        }
-                    });//new Chart끝
-
+                            }
+                    });
                 },
-                error : function(){
-                    console.log("에러발생");
+                error:function(){
+                    alert('실패');
                 }
-            });//ajax끝
 
-            
-        }//function끝
 
+            });//ajax
+
+        }//chartBtn    
+           
     </script>
 
+
+   
 </body>
 </html>

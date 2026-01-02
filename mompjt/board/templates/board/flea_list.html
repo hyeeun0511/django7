@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+
+<!-- 25-12-29 슬기 수정: 검색 기능 추가, 찜 목록 floating 패널 추가 -->
+<!-- CSS: static/css/flea_list.css -->
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/flea_list.css' %}">
+
+<div class="flea-container">
+    <div class="flea-header">
+        <h2>벼룩시장</h2>
+        <form method="get">
+            <div class="flea-header-form-div">
+                <input type="text" name="search" value="{{ search_query }}" placeholder="제목, 내용, 작성자로 검색...">
+                <button type="submit" style="padding:0 24px; background:#ff6b6b; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer; height:100%; white-space:nowrap;">검색</button>
+                {% if search_query %}
+                <a href="{% url 'board:flea_list' %}" style="padding:0 16px; background:#6c757d; color:white; border-radius:8px; text-decoration:none; display:flex; align-items:center; height:100%; white-space:nowrap;">전체보기</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    {% if search_query %}
+    <p style="color:#495057; margin:16px 0; font-size:14px;">
+        "<strong>{{ search_query }}</strong>" 검색 결과: <strong>{{ items.count }}</strong>건
+    </p>
+    {% endif %}
+
+    {% if items %}
+    <div class="flea-grid">
+        {% for item in items %}
+        <article class="flea-card {% if item.status == 'sold' %}flea-sold{% endif %}">
+            <a href="{% url 'board:flea_detail' item.pk %}">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.title }}" class="flea-thumb {% if item.status == 'sold' %}flea-sold-img{% endif %}">
+                {% else %}
+                <div class="flea-thumb placeholder">이미지 없음</div>
+                {% endif %}
+                
+                {% if item.status == 'sold' %}
+                <div class="flea-sold-badge">SOLD OUT</div>
+                {% endif %}
+                
+                <div class="flea-body">
+                    <h3>{{ item.title }}</h3>
+                    <p class="flea-price">{{ item.price|intcomma }}원</p>
+                    <p class="flea-meta">{{ item.author.nickname|default:item.author.username }} · {{ item.created_at|date:"Y.m.d" }}</p>
+                </div>
+            </a>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="text-align:center; color:#868e96; padding:40px 0;">
+        {% if search_query %}
+        검색 결과가 없습니다.
+        {% else %}
+        등록된 상품이 없습니다.
+        {% endif %}
+    </p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    <div class="flea-actions">
+        <a class="btn-login-submit" href="{% url 'board:flea_create' %}" style="text-decoration: none; text-align:center;">글쓰기</a>
+    </div>
+
+    <div class="flea-liked-floating">
+        <div class="flea-liked-header">내 찜 목록</div>
+        <div class="flea-liked-body">
+            {% if liked_items %}
+                {% for item in liked_items %}
+                <a class="flea-liked-item" href="{% url 'board:flea_detail' item.pk %}">
+                    <div class="flea-liked-title">{{ item.title }}</div>
+                    <div class="flea-liked-meta">{{ item.price|intcomma }}원 · {{ item.author.nickname|default:item.author.username }}</div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <p class="flea-liked-empty">아직 찜한 상품이 없습니다.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.flea-liked-floating {
+    position: fixed;
+    right: 24px;
+    bottom: 110px;
+    width: 260px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    z-index: 900;
+}
+
+.flea-liked-header {
+    background: #ffb6c1;
+    color: #4a4a4a;
+    font-weight: 800;
+    padding: 12px 14px;
+    font-size: 15px;
+}
+
+.flea-liked-body {
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 10px 12px;
+    background: #fffafc;
+}
+
+.flea-liked-item {
+    display: block;
+    padding: 10px 8px;
+    border-radius: 10px;
+    color: #212529;
+    text-decoration: none;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.flea-liked-item:hover {
+    background: #ffe7ef;
+    transform: translateY(-1px);
+}
+
+.flea-liked-title {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #343a40;
+}
+
+.flea-liked-meta {
+    font-size: 12px;
+    color: #868e96;
+}
+
+.flea-liked-empty {
+    margin: 6px 0;
+    color: #adb5bd;
+    font-size: 13px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .flea-liked-floating {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        margin-top: 16px;
+    }
+
+    .flea-liked-body {
+        max-height: none;
+    }
+}
+</style>
+{% endblock %}

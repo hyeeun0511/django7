@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+<!-- 25-12-29 슬기 수정: 댓글 작성/표시 기능 추가, 찜하기 기능 추가, 비밀글 표시, 작성자만 수정/삭제 가능, 상태 변경 드롭다운 추가 -->
+{% block content %}
+<style>
+    .status-badge {
+        display: inline-block;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 14px;
+    }
+    
+    .status-selling {
+        background-color: #e7f5ff;
+        color: #1971c2;
+    }
+    
+    .status-reserved {
+        background-color: #fff3bf;
+        color: #d39e00;
+    }
+    
+    .status-sold {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-btn {
+        background-color: #ff6b6b;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 700;
+    }
+    
+    .status-btn:hover {
+        background-color: #ff5252;
+    }
+    
+    .status-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        min-width: 140px;
+        z-index: 1000;
+        margin-top: 4px;
+    }
+    
+    .status-menu.show {
+        display: block;
+    }
+    
+    .status-option {
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    
+    .status-option:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .status-option-selling {
+        color: #1971c2;
+        font-weight: 600;
+    }
+    
+    .status-option-reserved {
+        color: #d39e00;
+        font-weight: 600;
+    }
+    
+    .status-option-sold {
+        color: #721c24;
+        font-weight: 600;
+    }
+</style>
+
+<div class="login-container" style="max-width: 960px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">{{ item.title }}</h2>
+        <span class="status-badge status-{{ item.status }}" id="statusBadge">
+            {% if item.status == 'selling' %}판매중
+            {% elif item.status == 'reserved' %}예약중
+            {% else %}판매완료{% endif %}
+        </span>
+    </div>
+
+    {% if item.image %}
+    <div style="margin-bottom:20px; text-align:center; position:relative;">
+        <img src="{{ item.image.url }}" alt="{{ item.title }}" id="itemImage"
+             style="max-width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.05);
+                    {% if item.status == 'sold' %}opacity: 0.5;{% endif %}">
+        {% if item.status == 'sold' %}
+        <div id="soldOverlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                    background: rgba(0,0,0,0.7); color: white; padding: 20px 40px; 
+                    border-radius: 12px; font-size: 24px; font-weight: 700;">
+            SOLD OUT
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="form-group">
+        <label>가격</label>
+        <input type="text" value="{{ item.price|intcomma }}원" readonly style="background:#e9ecef; cursor:not-allowed;">
+    </div>
+
+    <div class="form-group">
+        <label>내용</label>
+        <textarea readonly style="background:#e9ecef; cursor:not-allowed; min-height:200px;">{{ item.description }}</textarea>
+    </div>
+
+    <div style="margin: 10px 0 0; display:flex; justify-content: space-between; align-items:center;">
+        <span style="color:#ff6b6b; font-weight:700;">❤️ {{ item.liked_by.count|intcomma }}</span>
+        {% if user.is_authenticated %}
+            <a href="{% url 'board:flea_like_toggle' item.pk %}" style="color:{% if user in item.liked_by.all %}#ff6b6b{% else %}#adb5bd{% endif %}; text-decoration:none; font-weight:700;">{% if user in item.liked_by.all %}찜 취소{% else %}찜하기{% endif %}</a>
+        {% else %}
+            <span style="color:#adb5bd; font-size:13px;">로그인 후 찜 가능합니다</span>
+        {% endif %}
+    </div>
+
+    <p style="color:#868e96; font-size:14px; text-align:right; margin-top:10px;">{{ item.author.nickname|default:item.author.username }} · {{ item.created_at|date:"Y-m-d H:i" }}</p>
+
+    {% if user == item.author %}
+    <div style="text-align:right; margin-top:20px;">
+        <div style="display: inline-block; position: relative;">
+            <button id="statusBtn" class="status-btn" onclick="toggleStatusMenu(event)">상태 변경 ▼</button>
+            <div id="statusMenu" class="status-menu">
+                <div class="status-option status-option-selling" onclick="changeStatus('selling', event)">판매중</div>
+                <div class="status-option status-option-reserved" onclick="changeStatus('reserved', event)">예약중</div>
+                <div class="status-option status-option-sold" onclick="changeStatus('sold', event)">판매완료</div>
+            </div>
+        </div>
+        <a href="{% url 'board:flea_edit' item.pk %}" style="color:#ff6b6b; text-decoration:none; margin-left:10px;">수정</a>
+        <a href="{% url 'board:flea_delete' item.pk %}" style="color:#dc3545; text-decoration:none; margin-left:10px;">삭제</a>
+    </div>
+    {% endif %}
+
+    <div class="login-links" style="margin-top:20px; text-align:right;">
+        <a href="{% url 'board:flea_list' %}">목록으로 돌아가기</a>
+    </div>
+
+    <hr style="margin:30px 0;">
+
+    <div>
+        <h3 style="font-size:18px; margin-bottom:10px;">댓글</h3>
+        {% if comments %}
+            {% for comment in comments %}
+            <div style="padding:14px 12px; border:1px solid #e9ecef; border-radius:10px; margin-bottom:12px; background:#fafbfd;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:8px;">
+                    <div style="font-weight:700;">{{ comment.nickname }}</div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="font-size:12px; color:#adb5bd;">{{ comment.created_at|date:"Y-m-d H:i:s" }}{% if comment.is_secret %} · 비밀글{% endif %}</div>
+                        {% if user == comment.author %}
+                        <div style="font-size:12px;">
+                            <a href="{% url 'board:flea_comment_edit' item.pk comment.id %}" style="color:#ff6b6b; margin-right:6px;">수정</a>
+                            <a href="{% url 'board:flea_comment_delete' item.pk comment.id %}" style="color:#dc3545;">삭제</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="font-weight:700; color:#343a40; margin-bottom:4px;">{{ comment.title }}</div>
+                {% if comment.is_secret %}
+                    <p style="margin:0; color:#adb5bd; font-size:13px;">🔒 비밀글입니다.</p>
+                {% else %}
+                    <p style="margin:0; color:#495057; white-space:pre-line;">{{ comment.content }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color:#adb5bd;">첫 댓글을 남겨보세요.</p>
+        {% endif %}
+    </div>
+
+    <div style="margin-top:18px;">
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'board:flea_comment_create' item.pk %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>제목</label>
+                {{ comment_form.title }}
+            </div>
+            <div class="form-group">
+                <label>내용</label>
+                {{ comment_form.content }}
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:12px;">
+                {{ comment_form.is_secret }}<label style="margin:0; font-size:14px; color:#495057;">비밀글로 작성</label>
+            </div>
+            <div class="form-group">
+                <label>비밀글 비밀번호</label>
+                {{ comment_form.password }}
+            </div>
+            <button type="submit" class="btn-login-submit" style="width:120px;">댓글 등록</button>
+        </form>
+        {% else %}
+            <p style="color:#adb5bd;">댓글을 작성하려면 로그인하세요.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 25-12-29 슬기 수정: 상태 변경 드롭다운 AJAX 스크립트 -->
+<script>
+const statusMap = {
+    'selling': { label: '판매중', class: 'status-selling' },
+    'reserved': { label: '예약중', class: 'status-reserved' },
+    'sold': { label: '판매완료', class: 'status-sold' }
+};
+
+function toggleStatusMenu(event) {
+    event.stopPropagation();
+    const menu = document.getElementById('statusMenu');
+    menu.classList.toggle('show');
+}
+
+async function changeStatus(newStatus, event) {
+    event.stopPropagation();
+    
+    const itemPk = {{ item.pk }};
+    
+    try {
+        const formData = new FormData();
+        formData.append('status', newStatus);
+        
+        const response = await fetch(`/board/flea/${itemPk}/status/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // 배지 업데이트
+            const badge = document.getElementById('statusBadge');
+            badge.textContent = statusMap[newStatus].label;
+            badge.className = `status-badge ${statusMap[newStatus].class}`;
+            
+            // 판매완료시 이미지 처리
+            const img = document.getElementById('itemImage');
+            if (img) {
+                if (newStatus === 'sold') {
+                    img.style.opacity = '0.5';
+                    let overlay = document.getElementById('soldOverlay');
+                    if (!overlay) {
+                        overlay = document.createElement('div');
+                        overlay.id = 'soldOverlay';
+                        overlay.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.7); color: white; padding: 20px 40px; border-radius: 12px; font-size: 24px; font-weight: 700;';
+                        overlay.textContent = 'SOLD OUT';
+                        img.parentElement.appendChild(overlay);
+                    }
+                } else {
+                    img.style.opacity = '1';
+                    const overlay = document.getElementById('soldOverlay');
+                    if (overlay) overlay.remove();
+                }
+            }
+            
+            // 메뉴 닫기
+            document.getElementById('statusMenu').classList.remove('show');
+            alert(`상태가 ${statusMap[newStatus].label}로 변경되었습니다.`);
+        } else {
+            alert(data.error || '상태 변경에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('오류가 발생했습니다.');
+    }
+}
+
+// 외부 클릭시 메뉴 닫기
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('statusMenu');
+    const btn = document.getElementById('statusBtn');
+    if (!btn.contains(event.target) && !menu.contains(event.target)) {
+        menu.classList.remove('show');
+    }
+});
+</script>
+{% endblock %}

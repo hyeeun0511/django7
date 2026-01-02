@@ -1,17 +1,14 @@
-{% extends "base.html" %}  
+{% extends "base.html" %}
 
 {% block script %}
 <script type="text/javascript">
 
 	if ('{{result}}'=='1'){
-		alert("로그인이 되었습니다.");
-		location.href="/";
-	} else if ('{{result}}'=='0'){
-		alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+		alert('로그인이 되었습니다.');
+		location.href = '/';
+	}else if('{{result}}' == '0'){
+		alert('아이디 또는 패스워드가 일치 하지 않습니다.');
 	}
-
-
-
 </script>
 {% endblock script %}
 
@@ -52,7 +49,7 @@
 							<script>
 								function loginBtn(){
 									if($("input[name='id']").val().length<1){
-										alert("아이디를 입력하셔야 로그인 가능합니다.");
+										alert("아이디를 입력하셔야 로그인이 가능합니다.");
 										return;
 									}
 									frm.submit();
@@ -64,7 +61,6 @@
 									<li><input type="text" name='id' class="loginType" onfocus="this.className='mfocus'" onblur="if (this.value.length==0) {this.className='loginType'}else {this.className='mfocusnot'}" style="ime-mode:inactive;" /></li>
 									<li><input type="password" name='pw' class="passType" onfocus="this.className='mfocus'" onblur="if (this.value.length==0) {this.className='passType'}else {this.className='mfocusnot'}" style="ime-mode:inactive;" /></li>
 								</ul>
-								
 								
 								<div class="btn"><a class="sbtn" onclick='loginBtn()'>로그인</a></div>
 							</form>

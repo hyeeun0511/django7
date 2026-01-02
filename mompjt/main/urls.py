@@ -1,0 +1,10 @@
+from django.urls import path
+from . import views
+
+app_name = 'main'
+
+urlpatterns = [
+    path('', views.index, name='index'),
+    path('search/', views.search, name='search'),
+    path('growth/', views.growth_chart, name='growth_chart'),
+]

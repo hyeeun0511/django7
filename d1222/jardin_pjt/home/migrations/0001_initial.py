@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='chartData',
+            name='ChartData',
             fields=[
                 ('cno', models.AutoField(primary_key=True, serialize=False)),
                 ('cyear', models.CharField(max_length=4)),

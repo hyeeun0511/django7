@@ -9,8 +9,10 @@ urlpatterns = [
     path('member/', include('member.urls')),
     path('product/', include('product.urls')),
     path('customer/', include('customer.urls')),
+    path('comment/', include('comment.urls')),
+    
 ]
 
+
 # 파일업로드시 url구성, urlpatterns에 추가 설정
-urlpatterns += static(settings.MEDIA_URL,
-             document_root = settings.MEDIA_ROOT )
+urlpatterns += static(settings.MEDIA_URL,document_root = settings.MEDIA_ROOT )

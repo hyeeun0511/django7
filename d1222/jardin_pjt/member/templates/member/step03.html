@@ -262,24 +262,24 @@ $(document).ready(function() {
 										alert("서버에서 아이디가 있는지 확인합니다.");
 										let id = document.getElementById('id').value;
 										$.ajax({
-											url:'/member/idCheck/', //요청경로
-											type:'get', //요청방식
-											dataType:'json', //요청데이터 형식
-											data:{'id':id}, //요청시 전달값
+											url:'/member/idCheck/',
+											type:'get',
+											dataType:'json',
+											data:{'id':id},
 											success:function(data){
 												alert('성공');
-												if(data == '사용가능'){
-													document.getElementById('id_check').innerHTML='<span class="mvalign black">* 아이디 사용가능</span>';
+												if(data.result == '사용가능'){
+													document.getElementById('id_check').innerHTML = '<span class="mvalign black">* 아이디 사용가능</span>';
 												}else{
-													document.getElementById('id_check').innerHTML='<span class="mvalign orange">* 아이디가 존재합니다.</span>';
+													document.getElementById('id_check').innerHTML = '<span class="mvalign orange">* 아이디가 존재합니다.</span>';
 												}
 											},
 											error:function(){
 												alert('실패');
 											}
 
-										});//ajax끝
-									}//idChkBtn끝
+										});//ajax
+									}//idChkBtn
 								</script>
 								<tr>
 									<th scope="row"><span>아이디 *</span></th>
@@ -291,9 +291,12 @@ $(document).ready(function() {
 											</li>
 											<li class="pt5">
 												<span id='id_check'>
+													
+													
 												</span>
 												<br>
-												<span class="mvalign">첫 글자는 영문으로 4~16자 까지 가능, 영문, 숫자와 특수기호(_)만 사용 가능</span></li>
+												<span class="mvalign">첫 글자는 영문으로 4~16자 까지 가능, 영문, 숫자와 특수기호(_)만 사용 가능</span>
+											</li>
 										</ul>
 									</td>
 								</tr>

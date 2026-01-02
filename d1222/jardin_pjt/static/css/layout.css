@@ -4,7 +4,6 @@ html{overflow-y:scroll; width:100%;}
 #wrap{}
 a{cursor: pointer;}
 
-
 /* 하위브라우저 체크 */
 #ieUser{width:100%; height:83px; background:#083457; overflow:hidden;}
 #ieUser .iewrap{position:relative; max-width:1000px; margin:28px auto 0;}

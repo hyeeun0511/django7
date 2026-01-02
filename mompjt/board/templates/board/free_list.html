@@ -1,0 +1,124 @@
+<!--
+═══════════════════════════════════════════════════════════════════════
+free_list.html - 자유게시판 목록
+═══════════════════════════════════════════════════════════════════════
+작성일: 2025-12-29
+기능: 자유게시판 목록 표시, 글쓰기
+-->
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 900px; margin: 50px auto; padding: 20px;">
+    <h2 style="text-align: center; margin-bottom: 10px; font-weight: 800;">
+        <a href="{% url 'board:free_list' %}" style="text-decoration: none; color: #333;">
+            자유게시판
+        </a>
+    </h2>
+
+    <!-- 총 게시글 개수 -->
+    <div style="text-align: right; margin-bottom: 10px; color: #666; font-size: 14px;">
+        총 <strong>{{ total_count }}</strong>개
+    </div>
+    
+    <table style="width: 100%; border-collapse: collapse; border-top: 2px solid #333;">
+        <thead>
+            <tr style="background: #f8f9fa; border-bottom: 1px solid #ddd;">
+                <th style="padding: 15px; width: 10%;">번호</th>
+                <th style="padding: 15px; text-align: left;">제목</th>
+                <th style="padding: 15px; width: 15%;">작성자</th>
+                <th style="padding: 15px; width: 15%;">날짜</th>
+                <th style="padding: 15px; width: 10%;">조회</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if posts %}
+                {% for post in posts %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <!-- 리스트 번호 (views.py에서 post.number 세팅) -->
+                    <td style="padding: 15px; text-align: center;">
+                        {{ post.number }}
+                    </td>
+
+                    <!-- 제목 (현재 페이지 번호를 함께 전달) -->
+                    <td style="padding: 15px;">
+                        <a href="{% url 'board:free_detail' post.pk %}?page={{ page_obj.number }}"
+                           style="text-decoration: none; color: #333; font-weight: 500;">
+                            {{ post.title }}
+                        </a>
+                    </td>
+
+                    <!-- 작성자 -->
+                    <td style="padding: 15px; text-align: center; color: #666;">
+                        {{ post.author.nickname|default:post.author.username }}
+                    </td>
+
+                    <!-- 작성일 -->
+                    <td style="padding: 15px; text-align: center; color: #666;">
+                        {{ post.created_at|date:"Y-m-d" }}
+                    </td>
+
+                    <!-- 조회수 -->
+                    <td style="padding: 15px; text-align: center; color: #666;">
+                        {{ post.views }}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5" style="text-align:center; padding:30px;">
+                        등록된 게시글이 없습니다.
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <!-- 페이지네이션 -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div style="text-align:center; margin-top:20px;">
+        <div style="display:inline-block;">
+
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}"
+               style="margin:0 5px; padding:6px 10px; border:1px solid #ddd; 
+                      border-radius:4px; text-decoration:none; color:#333;">
+                &lt;
+            </a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                <span style="margin:0 5px; padding:6px 10px; 
+                             border-radius:4px; background:#495057; color:#fff;">
+                    {{ num }}
+                </span>
+                {% else %}
+                <a href="?page={{ num }}"
+                   style="margin:0 5px; padding:6px 10px; border:1px solid #ddd; 
+                          border-radius:4px; text-decoration:none; color:#333;">
+                    {{ num }}
+                </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}"
+               style="margin:0 5px; padding:6px 10px; border:1px solid #ddd; 
+                      border-radius:4px; text-decoration:none; color:#333;">
+                &gt;
+            </a>
+            {% endif %}
+
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 글쓰기 버튼 -->
+    <div style="text-align: right; margin-top: 20px;">
+        <a href="{% url 'board:free_create' %}" 
+           style="display: inline-block; padding: 10px 20px; background: #ff6b6b; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            글쓰기
+        </a>
+    </div>
+
+</div>
+{% endblock %}
